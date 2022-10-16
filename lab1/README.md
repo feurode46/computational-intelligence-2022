@@ -21,11 +21,9 @@ Below is the solution using a simple priority queue based on lowest cost for the
 
 (full solution can be viewed in the file `raw_output_1st_ver.txt`)
 
-    Solution for N=5: w=5 (bloat=0%)
-    Solution for N=10: w=13 (bloat=30%)
-    Solution for N=20: w=46 (bloat=130%)
-    Solution for N=30: w=70 (bloat=133%)
-    Solution for N=50: w=137 (bloat=174%)
-    Solution for N=100: w=332 (bloat=232%)
+    Solution for N=5: w=5 (bloat=0%), nodes=36
+    Solution for N=10: w=13 (bloat=30%), nodes=472
+    Solution for N=20: w=46 (bloat=130%), nodes=841
+    Solution for N=100: w=332 (bloat=232%), nodes=68546
 
 The search function was based on professor's Squillero's template from _Lecture 02 - Searching for paths_.
