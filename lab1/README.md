@@ -9,3 +9,12 @@ such that each number between $0$ and $N-1$ appears in at least one list
 $$\\forall n \\in [0, N-1] \\ \\exists i : n \\in L_{s_i}$$
 
 and that the total numbers of elements in all $L_{s_i}$ is minimum.
+
+## 1st version with simple Dijkstra's algorithm:
+
+    Solution for N=5: w=5 (bloat=0%)
+    Solution for N=10: w=13 (bloat=30%)
+    Solution for N=20: w=46 (bloat=130%)
+    Solution for N=30: w=70 (bloat=133%)
+    Solution for N=50: w=137 (bloat=174%)
+    Solution for N=100: w=332 (bloat=232%)
