@@ -12,9 +12,13 @@ and that the total numbers of elements in all $L_{s_i}$ is minimum.
 
 ## 1st version with simple Dijkstra's algorithm:
 
+This algorithm uses a frontier in which the state with the lowest cost (total length of lists) is extracted first.
+
     Solution for N=5: w=5 (bloat=0%)
     Solution for N=10: w=13 (bloat=30%)
     Solution for N=20: w=46 (bloat=130%)
     Solution for N=30: w=70 (bloat=133%)
     Solution for N=50: w=137 (bloat=174%)
     Solution for N=100: w=332 (bloat=232%)
+
+The search function was based on professor's Squillero's template from _Lecture 02 - Searching for paths_.
