@@ -10,7 +10,7 @@ $$\\forall n \\in [0, N-1] \\ \\exists i : n \\in L_{s_i}$$
 
 and that the total numbers of elements in all $L_{s_i}$ is minimum.
 
-## 1st version using simple Dijkstra's algorithm:
+## 1st version using simple ~~Dijkstra's~~ algorithm:
 
 This algorithm uses a frontier in which the state with the lowest cost (total length of lists) is extracted first.
 The states are inserted in the frontier in an ordered way based on cost.
@@ -27,3 +27,43 @@ Below is the solution using a simple priority queue based on lowest cost for the
     Solution for N=100: w=332 (bloat=232%), nodes=68546
 
 The search function was based on professor's Squillero's template from _Lecture 02 - Searching for paths_.
+
+## 2nd ver. - Beam search with improvements and reflections on peer feedback
+
+I made some fundamental changes to the program structure.
+
+Namely, I made the solution and the state one and the same, implemented the frontier with PriorityQueue() found in gx_utils by prof. Squillero, found a better way to hash states, and generally refactored some code.
+
+The hash for a state is now calculated from its string representation, and it's not kept in a dictionary anymore. Instead, the state_cost dictionary maps the state's hash (calculated on the fly) to its cost.
+
+I also limited the frontier's size, effectively implementing a beam search. This limit is not fixed for all values of N, but instead changes with a ratio of 1000/N, so that solutions can be found in a timely manner even for big sizes. Further optimization will eventually remove the need for limiting the frontier.
+
+This new solutions is much faster than the last one, able to generate at least _some_ results for higher values of N, up to 1000.
+
+Here are the results: 
+
+    N=5, visited: 2423
+    Solution for N=5: w=5 (bloat=0%)
+    ----
+    N=10, visited: 29810
+    Solution for N=10: w=18 (bloat=80%)
+    ----
+    N=20, visited: 17957
+    Solution for N=20: w=58 (bloat=190%)
+    ----
+    N=30, visited: 48117
+    Solution for N=30: w=77 (bloat=157%)
+    ----
+    N=50, visited: 68594
+    Solution for N=50: w=156 (bloat=212%)
+    ----
+    N=100, visited: 127838
+    Solution for N=100: w=575 (bloat=475%)
+    ----
+    N=500, visited: 109420
+    Solution for N=500: w=2804 (bloat=461%)
+    ----
+    N=1000, visited: 151138
+    Solution for N=1000: w=7570 (bloat=657%)
+    
+This search performs generally worse than the last one, but is at least able to produce solutions for higher values of N. Further work is needed, but the program structure and size is much better now.
