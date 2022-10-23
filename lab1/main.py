@@ -2,6 +2,7 @@
 
 import random
 import lablib as ll
+import hashlib
 import logging
 
 
@@ -14,99 +15,90 @@ def problem(N, seed=None):
 
 
 def goal_test(state, N):
-    goal_state = list(range(N))
-    return sorted(state) == goal_state
+    all_numbers = list(range(N))
+    for sl in state:
+        for n in all_numbers:
+            if n in sl:
+                all_numbers.remove(n)
+                if len(all_numbers) == 0:
+                    break
+    return len(all_numbers) == 0
 
 
-def possible_actions(state, P, solution):
+def possible_actions(state, P):
     list_of_actions = list()
     for el in P:
-        if el not in solution and el not in list_of_actions:
-            for n in el:
-                if n not in state:
-                    list_of_actions.append(el)
+        if el not in state:
+            list_of_actions.append(el)
     return list_of_actions
 
 
-def result(state, action, solution):  # generate state from solution instead of updating
-    new_state = list()
-    new_solution = solution.copy()
-    new_solution.append(action.copy())
-    for el in new_solution:
-        for n in el:
-            if n not in new_state:
-                new_state.append(n)
-    return [new_state, new_solution]
+def result(state, action):
+    new_state = state.copy()
+    new_state.append(action)
+    return new_state
 
 
-def cost_function(solution):
-    if len(solution) == 0:
-        return float('inf')
-    return sum(len(_) for _ in solution)
+def cost_function(state):
+    if len(state) == 0:
+        return 0
+    return sum(len(_) for _ in state)
 
 
-
-def add_state_cost(state_hashes, state_cost, state, cost):
-    # generate hash
-    name = random.getrandbits(128)
-    state_hashes[name] = state.copy()
-    state_cost[name] = cost
+def unit_cost(action):
+    return len(action)
 
 
-def get_state_hash(state_hashes, state):
-    for h in state_hashes.keys():
-        if state == state_hashes[h]:
-            return h
-    return None
+def priority_function(state):
+    return cost_function(state)
 
 
-def get_state_cost(state_hashes, state_cost, state):
-    for h in state_hashes.keys():
-        if state == state_hashes[h]:
-            return state_cost[h]
-    return None
+def state_hash(state):
+    # calculate the hash of a state by hashing its string representation
+    h = hashlib.md5(str(state).encode())
+    return h.hexdigest()
 
 
-def update_state_cost(state_hashes, state_cost, state, cost):
-    for h in state_hashes.keys():
-        if state == state_hashes[h]:
-            state_cost[h] = cost
-
-
-def search(state, N, P):  # initial state: [], goal state: [0, 1, 2...N-1]
-    solution = list()
-    state_hashes = dict()  # associations hash : state
-    state_cost = dict()  # associations state_hash : cost
+def search(N, P):  # initial state: [], goal state: one that contains all numbers
+    state = list()
+    state_cost = dict()
     frontier = ll.Frontier()  # priority queue
+    state_cost[state_hash(state)] = 0
+    FLIMIT = 1000/N
 
     while state is not None and not goal_test(state, N):
-        for a in possible_actions(state, P, solution):
-            [new_state, new_solution] = result(state, a, solution)
-            if get_state_hash(state_hashes, new_state) is None and new_state not in frontier:
-                add_state_cost(state_hashes, state_cost, new_state, cost_function(new_solution))
-                frontier.add(new_state, get_state_cost(state_hashes, state_cost, new_state))
-                # update solution
-                solution = new_solution.copy()
-            elif new_state in frontier and cost_function(new_solution) < get_state_cost(
-                    state_hashes, state_cost, new_state):
+        count = 0  # limit number of actions
+        for a in possible_actions(state, P):
+            new_state = result(state, a)
+            cost = unit_cost(a)  # unit cost of action a
+            if state_hash(new_state) not in state_cost and new_state not in frontier:
+                # update total cost for new state
+                state_cost[state_hash(new_state)] = state_cost[state_hash(state)] + cost
+                # put in frontier
+                # limit length of frontier
+                if frontier.length < FLIMIT:
+                    frontier.push(new_state, p=priority_function(new_state))
+
+            elif new_state in frontier and state_cost[state_hash(new_state)] > state_cost[state_hash(state)] + cost:
                 # update node and solution
-                update_state_cost(state_hashes, state_cost, new_state, cost_function(new_solution))
-                solution = new_solution.copy()
+                state_cost[state_hash(new_state)] = state_cost[state_hash(state)] + cost
         if frontier:
             state = frontier.pop()
         else:
             state = None
-    return solution
+    print(f"N={N}, visited: {len(state_cost)}")
+    return state
 
 
 if __name__ == "__main__":
-    Ns = [5, 10, 20, 30, 50, 100]
+    Ns = [5, 10, 20, 30, 50, 100, 500, 1000]
     for N in Ns:
         ls = problem(N, 42)
         all_lists = sorted(ls, key=lambda l: len(l))
-        solution = search(list(), N, all_lists)
+        solution = search(N, all_lists)
         print(
             f"Solution for N={N}: w={sum(len(_) for _ in solution)} (bloat={(sum(len(_) for _ in solution) - N) / N * 100:.0f}%)"
         )
         print(f"{solution}")
+        print("---------")
 
