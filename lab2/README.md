@@ -1,4 +1,4 @@
-# Lab 2: Set Covering with Genetic Algorithms
+# Lab 2: Set Covering with Evolutionary Algorithms
 
 ## Task
 
