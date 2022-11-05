@@ -2,7 +2,7 @@ import random
 
 class EvolutionaryModel:
 
-    def __init__(self, problem, N=5, pop_size=100, offspring_size=2, epochs=10000, fitness_evaluations_threshold=10000):
+    def __init__(self, problem, N=5, pop_size=150, offspring_size=100, epochs=1000, fitness_evaluations_threshold=10000, mutation_chance = 0.2):
         self.problem = problem
         self.N = N
         self.problem_size = len(self.problem)
@@ -13,7 +13,7 @@ class EvolutionaryModel:
         self.total_length = sum(len(i) for i in self.problem)
         self.fitness_evaluations = 0
         self.fitness_evaluations_threshold = fitness_evaluations_threshold
-        self.mutation_chance = 0.2
+        self.mutation_chance = mutation_chance
 
         # generate initial individuals
         for i in range(self.population_size):
@@ -27,42 +27,28 @@ class EvolutionaryModel:
         individual = tuple([genome, fitness])
         return individual
     
-    # def generate_individual_smart(self):
-    #     self.problem = sorted(self.problem)
-    #     # since lists with fewer values are at the start, try to include them more in starting population
-    #     genome = list()
-    #     genome.extend([random.choice([0, 1, 1, 1]) for _ in range(int(self.problem_size/4))])
-    #     genome.extend([random.choice([0, 1]) for _ in range(int(self.problem_size/4), int(self.problem_size/2))])
-    #     genome.extend([random.choice([0, 0, 0, 1]) for _ in range(int(self.problem_size/2), int(self.problem_size))])
-    #     genome = tuple(genome)
-    #     fitness = self.fitness_eval(genome)
-    #     individual = tuple([genome, fitness])
-    #     return individual
 
-
-    def fitness_eval_old(self, genome):
-    # tuple with: 1) number of digits included, 2) number of total elements 3) penalty for repeated digits
-    #                higher is better              lower is better             lower is better
-        digits = list()
-        penalty = 0
-        n_el = 0
-        for i in range(len(genome)):
-            if genome[i] == 1:
-                n_el += len(self.problem[i]*genome[i])
-                # count number of digits in that list
-                for j in self.problem[i]:
-                    if j not in digits:
-                        digits.append(j)
-                    else:
-                        penalty += 1
-        self.fitness_evaluations += 1
-        return tuple([len(digits), -n_el, -penalty]) # negative since we want the max
+    # def fitness_eval_old(self, genome):
+    # # tuple with: 1) number of digits included, 2) number of total elements 3) penalty for repeated digits
+    # #                higher is better              lower is better             lower is better
+    #     digits = list()
+    #     penalty = 0
+    #     n_el = 0
+    #     for i in range(len(genome)):
+    #         if genome[i] == 1:
+    #             n_el += len(self.problem[i]*genome[i])
+    #             # count number of digits in that list
+    #             for j in self.problem[i]:
+    #                 if j not in digits:
+    #                     digits.append(j)
+    #                 else:
+    #                     penalty += 1
+    #     self.fitness_evaluations += 1
+    #     return tuple([len(digits), -n_el, -penalty]) # negative since we want the max
 
     def fitness_eval(self, genome):
-    # tuple with: 1) number of digits included, 2) number of total elements 3) penalty for repeated digits
-    #                higher is better              lower is better             lower is better
-        digits = list()
-        penalty = 0
+    # tuple with: 1) number of digits included, 2) number of total elements
+    #                higher is better              lower is better
         all_values = list()
         for i in range(len(genome)):
             if genome[i] == 1:
@@ -73,7 +59,7 @@ class EvolutionaryModel:
             if i in all_values:
                 count += 1
         self.fitness_evaluations += 1
-        return tuple([count, -len(all_values)]) # negative since we want the max
+        return tuple([count, -len(all_values)]) # negative since we want the min
     
     def select_parent(self, tournament_size=2):
         return max(random.choices(self.population, k=tournament_size), key=lambda i: i[1])
@@ -90,10 +76,7 @@ class EvolutionaryModel:
         new_genome = list(genome)
         for i in range(2):
             idx = random.randint(0, len(genome)-1)
-            if new_genome[idx] == 0:
-                new_genome[idx] = 1
-            else:
-                new_genome[idx] = 0
+            new_genome[idx] = not new_genome[idx]
         return tuple(new_genome)
 
     def evolve(self):
@@ -112,17 +95,17 @@ class EvolutionaryModel:
     def simulate(self):
         for i in range(self.epochs):
             self.evolve()
-            if i % (self.epochs/20) == 0:
-                print(f"{int(i/self.epochs*100)}%")
+            if self.fitness_evaluations % (self.fitness_evaluations_threshold/10) == 0:
+                print(f"{int(self.fitness_evaluations/self.fitness_evaluations_threshold*100)}%")
             if (self.fitness_evaluations > self.fitness_evaluations_threshold):
-                print("Maximum number of evaluations reached.")
+                print(f"Maximum number of evaluations ({self.fitness_evaluations}) reached. Trained for {i} generations.")
                 break
         print("100% Done!")
     
     def sort_population(self):
         self.population = sorted(self.population, key=lambda i: i[1], reverse=True)
 
-    def converted_solution(self):
+    def get_solution(self):
         if (self.population[0][1][0] < self.N):
             print("No solution has been found!")
             return list()
