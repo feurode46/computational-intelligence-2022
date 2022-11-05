@@ -40,7 +40,7 @@ class EvolutionaryModel:
     #     return individual
 
 
-    def fitness_eval(self, genome):
+    def fitness_eval_old(self, genome):
     # tuple with: 1) number of digits included, 2) number of total elements 3) penalty for repeated digits
     #                higher is better              lower is better             lower is better
         digits = list()
@@ -58,6 +58,22 @@ class EvolutionaryModel:
         self.fitness_evaluations += 1
         return tuple([len(digits), -n_el, -penalty]) # negative since we want the max
 
+    def fitness_eval(self, genome):
+    # tuple with: 1) number of digits included, 2) number of total elements 3) penalty for repeated digits
+    #                higher is better              lower is better             lower is better
+        digits = list()
+        penalty = 0
+        all_values = list()
+        for i in range(len(genome)):
+            if genome[i] == 1:
+                all_values.extend(self.problem[i])
+        digit_range = list(range(self.N))
+        count = 0
+        for i in digit_range:
+            if i in all_values:
+                count += 1
+        self.fitness_evaluations += 1
+        return tuple([count, -len(all_values)]) # negative since we want the max
     
     def select_parent(self, tournament_size=2):
         return max(random.choices(self.population, k=tournament_size), key=lambda i: i[1])
