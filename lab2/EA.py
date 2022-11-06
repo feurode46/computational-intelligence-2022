@@ -47,7 +47,6 @@ class EvolutionaryModel:
         return max(random.choices(self.population, k=tournament_size), key=lambda i: i[1])
     
     def cross_over(self, g1, g2):
-        # gene-by-gene crossover
         g3 = list()
         g3.extend([random.choice([g1[i], g2[i]]) for i in range(self.problem_size)])
         return tuple(g3)
@@ -60,6 +59,21 @@ class EvolutionaryModel:
             new_genome[idx] = not new_genome[idx]
         return tuple(new_genome)
 
+    def evolve_ES(self):
+        new_pop = list()
+        for i in range(self.offspring_size):
+            if random.randint(1, 10) < 10*self.mutation_chance:
+                offspring_genome = self.mutate(random.choice(self.population)[0])
+            else:
+                p1 = self.select_parent()
+                p2 = self.select_parent()
+                offspring_genome = self.cross_over(p1[0], p2[0])
+            new_pop.append(tuple([offspring_genome, self.fitness_eval(offspring_genome)]))
+        # then sort and trim
+        self.population = new_pop
+        self.sort_population()
+        self.population = self.population[:self.population_size]
+    
     def evolve(self):
         for i in range(self.offspring_size):
             if random.randint(1, 10) < 10*self.mutation_chance:
