@@ -12,7 +12,7 @@ and that the total numbers of elements in all $L_{s_i}$ is minimum.
 
 ## Solution
 
-As for the representation, I decided to go with a binary one: the genome is as long as the list of lists ($P$) and each gene denotes whether a list is chosen (1) or not (0). The initial population is chosen at random, so each list has a 50/50 chance of being included in a solution. A weighted approach was also tried, which skewed towards shorter or longer lists for the initial population selection, but ultimately it didn't make any difference.
+As for the representation, I decided to go with a binary one: the genome is as long as the list of lists (P) and each gene denotes whether a list is chosen (1) or not (0). The initial population is chosen at random, so each list has a 50/50 chance of being included in a solution. A weighted approach was also tried, which skewed towards shorter or longer lists for the initial population selection, but ultimately it didn't make any difference.
 
 The fitness function is a tuple consisting of:
 
