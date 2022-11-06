@@ -26,7 +26,7 @@ class EvolutionaryModel:
         fitness = self.fitness_eval(genome)
         individual = tuple([genome, fitness])
         return individual
-    
+
 
     def fitness_eval(self, genome):
     # tuple with: 1) number of digits included, 2) number of total elements
@@ -43,13 +43,16 @@ class EvolutionaryModel:
         self.fitness_evaluations += 1
         return tuple([count, -len(all_values)]) # negative since we want the min
     
+
     def select_parent(self, tournament_size=2):
         return max(random.choices(self.population, k=tournament_size), key=lambda i: i[1])
     
+
     def cross_over(self, g1, g2):
         g3 = list()
         g3.extend([random.choice([g1[i], g2[i]]) for i in range(self.problem_size)])
         return tuple(g3)
+
 
     def mutate(self, genome):
         # flip two random bits
@@ -58,6 +61,7 @@ class EvolutionaryModel:
             idx = random.randint(0, len(genome)-1)
             new_genome[idx] = not new_genome[idx]
         return tuple(new_genome)
+
 
     def evolve_ES(self):
         new_pop = list()
@@ -74,6 +78,7 @@ class EvolutionaryModel:
         self.sort_population()
         self.population = self.population[:self.population_size]
     
+
     def evolve(self):
         for i in range(self.offspring_size):
             if random.randint(1, 10) < 10*self.mutation_chance:
@@ -87,6 +92,7 @@ class EvolutionaryModel:
         self.sort_population()
         self.population = self.population[:self.population_size]
     
+
     def simulate(self):
         for i in range(self.epochs):
             self.evolve()
@@ -97,8 +103,10 @@ class EvolutionaryModel:
                 break
         print("100% Done!")
     
+
     def sort_population(self):
         self.population = sorted(self.population, key=lambda i: i[1], reverse=True)
+
 
     def get_solution(self):
         if (self.population[0][1][0] < self.N):

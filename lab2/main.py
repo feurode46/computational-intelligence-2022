@@ -9,9 +9,6 @@ def problem(N, seed=None):
     ]
 
 
-
-
-
 if __name__ == "__main__":
     Ns = [5, 10, 20, 100, 500, 1000]
     for N in Ns:
