@@ -15,7 +15,7 @@ class EvolutionaryModel:
         self.fitness_evaluations_threshold = fitness_evaluations_threshold
         self.mutation_chance = mutation_chance
 
-        # generate initial individuals
+        # generate initial population
         for i in range(self.population_size):
             self.population.append(self.generate_individual())
             self.sort_population()
@@ -27,24 +27,6 @@ class EvolutionaryModel:
         individual = tuple([genome, fitness])
         return individual
     
-
-    # def fitness_eval_old(self, genome):
-    # # tuple with: 1) number of digits included, 2) number of total elements 3) penalty for repeated digits
-    # #                higher is better              lower is better             lower is better
-    #     digits = list()
-    #     penalty = 0
-    #     n_el = 0
-    #     for i in range(len(genome)):
-    #         if genome[i] == 1:
-    #             n_el += len(self.problem[i]*genome[i])
-    #             # count number of digits in that list
-    #             for j in self.problem[i]:
-    #                 if j not in digits:
-    #                     digits.append(j)
-    #                 else:
-    #                     penalty += 1
-    #     self.fitness_evaluations += 1
-    #     return tuple([len(digits), -n_el, -penalty]) # negative since we want the max
 
     def fitness_eval(self, genome):
     # tuple with: 1) number of digits included, 2) number of total elements
@@ -65,8 +47,7 @@ class EvolutionaryModel:
         return max(random.choices(self.population, k=tournament_size), key=lambda i: i[1])
     
     def cross_over(self, g1, g2):
-        # cut = random.randint(0, self.problem_size)
-        # return g1[:cut] + g2[cut:]
+        # gene-by-gene crossover
         g3 = list()
         g3.extend([random.choice([g1[i], g2[i]]) for i in range(self.problem_size)])
         return tuple(g3)

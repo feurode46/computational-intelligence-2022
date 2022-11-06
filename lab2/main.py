@@ -16,10 +16,8 @@ if __name__ == "__main__":
     Ns = [5, 10, 20, 100, 500, 1000]
     for N in Ns:
         ls = problem(N, 42)
-        # print(ls)
         print(f"working on N={N}...")
-        ea = EvolutionaryModel(ls, N=N, pop_size=150, offspring_size=100, epochs=1000, fitness_evaluations_threshold=100000, mutation_chance=0.2)
-        # print(ea.population, sep="\n")
+        ea = EvolutionaryModel(ls, N=N, pop_size=150, offspring_size=100, epochs=1000, fitness_evaluations_threshold=50000, mutation_chance=0.2)
         ea.simulate()
         solution = ea.get_solution()
         print(
