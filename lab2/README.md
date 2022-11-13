@@ -49,3 +49,17 @@ Another run was performed with a $(\mu, \lambda)$ evolution strategy, with $\mu=
 | 1000 | 89272  | 8827% |
 
 In the end I wasn't able to understand why it couldn't find a good solution for N=1000 and up, having tried different crossover strategies, fitness functions and population and offspring sizes. I will keep adding to this to get to the bottom of it.
+
+## Updated solution (thanks to feedback)
+
+By changing the initial population selection, that is, not selecting a random subset of lists for each individual but instead choosing a single list at random, the results for high values of N improved by a great margin even with only 50,000 evaluations. Here are the results:
+
+|   N  | Weight | Bloat |
+|:----:|:------:|:-----:|
+| 5    | 5      | 0%    |
+| 10   | 10     | 0%    |
+| 20   | 24     | 20%   |
+| 100  | 220    | 120%  |
+| 500  | 1641   | 228%  |
+| 1000 | 3788   | 279%  |
+
