@@ -22,9 +22,13 @@ class EvolutionaryModel:
 
 
     def generate_individual(self):
-        genome = tuple([random.choice([0, 1]) for _ in range(self.problem_size)])
+        genome_list = list([0 for _ in range(self.problem_size)])
+        idx = random.randint(0, self.problem_size-1)
+        genome_list[idx] = 1
+        genome = tuple(genome_list)
         fitness = self.fitness_eval(genome)
         individual = tuple([genome, fitness])
+        # print(individual)
         return individual
 
 
