@@ -49,7 +49,7 @@ And the possible actions were:
 - Take all objects in a row
 - Take all but one object in a row
 
-The genome consists of two alleles, which correspond to probabilities $(0 <= p <= 1)$ of, respectively:
+The genome consists of two alleles, which correspond to probabilities $(0 \leq p \leq 1)$ of, respectively:
 
 - Taking all objects in the first available row when the number of active rows is even
 - Taking all objects in the first available row when the number of active rows is odd
