@@ -33,7 +33,7 @@ This strategy, albeit being extremely simple and deduced by playing some games b
 
 ## Task 3.2 - Evolved rules
 
-I came to the conclusion that a set of evolved rules had to involve decision trees as well, because there was no way a strategy could have been at all good if it made the same decision for a whole game, without taking into consideration aspects of the board. The decision had to be based on the state.
+I came to the conclusion that a set of evolved rules had to involve decision trees as well, because there was no way a strategy could have been at all good if it made the same decision for a whole game, without taking into consideration aspects of the board. The decision had to be based on the state. (Again, ignoring the existence of nim-sum).
 
 So I gave the algorithm a basic if-else structure, the same I was using with my strategy, and a list of possible actions, and with those a probability threshold with which to execute each action under each set of conditions.
 
