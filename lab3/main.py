@@ -19,8 +19,6 @@ def cook_status(state: Nim) -> dict:
     cooked["active_rows"] = list([o for o in enumerate(state.rows) if o[1] > 0])
     cooked["n_active_rows"] = len(cooked["active_rows"])
     cooked["rows_2_or_more"] = list([o for o in cooked["active_rows"] if o[1] > 1])
-    cooked["shortest_row"] = min((x for x in enumerate(state.rows) if x[1] > 0), key=lambda y: y[1])[0]
-    cooked["longest_row"] = max((x for x in enumerate(state.rows)), key=lambda y: y[1])[0]
     cooked["nim_sum"] = nim_sum(state)
 
     brute_force = list()
@@ -109,21 +107,6 @@ def evaluate_EA(ea, strategy, reverse=False):
     return won / NUM_MATCHES
 
 
-def make_strategy(genome: dict) -> Callable:
-    # change this!
-    def evolvable(state: Nim) -> Nimply:
-        data = cook_status(state)
-
-        if random.random() < genome["p"]:
-            ply = Nimply(data["shortest_row"], random.randint(1, state.rows[data["shortest_row"]]))
-        else:
-            ply = Nimply(data["longest_row"], random.randint(1, state.rows[data["longest_row"]]))
-
-        return ply
-
-    return evolvable
-
-
 def sample_game(n, strategy1: Callable, strategy2: Callable) -> None:
     strategy = (strategy1, strategy2)
     nim = Nim(n)
@@ -145,16 +128,21 @@ if __name__ == "__main__":
     ea = EvolutionaryModel(NIM_SIZE, 150, 100, 100, 10000, 0.2, NUM_MATCHES)
     ea.simulate()
     best = ea.best_genome()
-    print(best)
     ea_strategies = [
         my_strategy,
         random_strategy,
         optimal_strategy
     ]
-
+    print(f"--- Size={NIM_SIZE}, games={NUM_MATCHES} ---")
+    print("Evolved strategy: ")
+    print()
     for s in ea_strategies:
-        print(f"{ea.evolved_strategy.__name__} vs. {s.__name__} {evaluate_EA(ea, s) * 100}%")
-        print(f"{s.__name__} vs. {ea.evolved_strategy.__name__} {evaluate_EA(ea, s, reverse=True) * 100}%")
+        print(f"{ea.evolved_strategy.__name__} vs. {s.__name__}: winrate {evaluate_EA(ea, s) * 100}%")
+        print(f"{s.__name__} vs. {ea.evolved_strategy.__name__}: winrate {evaluate_EA(ea, s, reverse=True) * 100}%")
+
+    print()
+    print("Fixed strategy: ")
+    print()
 
     strategy_pairs = [
         (my_strategy, random_strategy),
@@ -162,10 +150,9 @@ if __name__ == "__main__":
     ]
     # sample_game(NIM_SIZE, my_strategy, random_strategy)
 
-    print(f"--- Size={NIM_SIZE}, games={NUM_MATCHES} ---")
     for p in strategy_pairs:
-        print(f"{p[0].__name__} vs. {p[1].__name__} {evaluate(p[0], p[1]) * 100}%")
-        print(f"{p[1].__name__} vs. {p[0].__name__} {evaluate(p[1], p[0]) * 100}%")
+        print(f"{p[0].__name__} vs. {p[1].__name__}: winrate {evaluate(p[0], p[1]) * 100}%")
+        print(f"{p[1].__name__} vs. {p[0].__name__}: winrate {evaluate(p[1], p[0]) * 100}%")
 
 
 
