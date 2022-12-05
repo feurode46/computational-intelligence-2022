@@ -31,21 +31,21 @@ The strategy is based on a decision tree, in which if the number of active rows 
 
 This strategy, albeit being extremely simple and deduced by playing some games by myself, is able to beat an opponent using random moves around 95% of the time, and it seems to scale quite well with increasing game size.
 
+When $k$ is introduced, my strategy is able to beat the optimal strategy with a winrate that increases with a lower k. With $k=3$ it is able to win around 20% of the time.
+
 ## Task 3.2 - Evolved rules
 
-I came to the conclusion that a set of evolved rules had to involve decision trees as well, because there was no way a strategy could have been at all good if it made the same decision for a whole game, without taking into consideration aspects of the board. The decision had to be based on the state. (Again, ignoring the existence of nim-sum).
+The evolved agent is based on a fixed decision tree structure, with probabilities of taking certain actions under certain conditions. (Again, ignoring the existence of nim-sum).
 
-So I gave the algorithm a basic if-else structure, the same I was using with my strategy, and a list of possible actions, and with those a probability threshold with which to execute each action under each set of conditions.
-
-
-The chosen conditions were:
+The chosen conditions are:
 
 - Even number of active rows (active: >=1 object)
 - Odd number of active rows
 - There are rows with more that one object
 - There are no rows with more than one object (forced move: take one object)
 
-And the possible actions were:
+And the possible actions are:
+
 - Take all objects in a row
 - Take all but one object in a row
 
@@ -61,3 +61,5 @@ The results of training the algorithm with a population size of 150, an offsprin
 This shows me that out of the possible actions under the specified conditions, the ones I had chosen by myself were the highest-winning ones, and the algorithm came to the same conclusion. The strategy achieves a 95% winrate against a random chance player. 
 
 Interestingly, by pitting my strategy against the evolved one, whoever starts first loses, because they are not able to reverse the even-odd row situation.
+
+When $k$ is introduced, whoever starts first has a small chance of winning.
