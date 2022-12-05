@@ -9,6 +9,7 @@ from EA import EvolutionaryModel
 
 NUM_MATCHES = 100
 NIM_SIZE = 5
+k = None
 
 
 def cook_status(state: Nim) -> dict:
@@ -43,7 +44,11 @@ def optimal_strategy(state: Nim) -> Nimply:
 
 def random_strategy(state: Nim) -> Nimply:
     row = random.choice([r for r, c in enumerate(state.rows) if c > 0])
-    num_objects = random.randint(1, state.rows[row])
+    if k is not None:
+        num_objects = random.randint(1, min(k, state.rows[row]))
+    else:
+        num_objects = random.randint(1, state.rows[row])
+
     return Nimply(row, num_objects)
 
 
@@ -56,12 +61,17 @@ def my_strategy(state: Nim) -> Nimply:
     n_objects = cooked_state["active_rows"][0][1]  # row value
 
     if len(cooked_state["rows_2_or_more"]) > 0:
+        row = cooked_state["rows_2_or_more"][0][0]
         if cooked_state["n_active_rows"] % 2 == 1:
-            row = cooked_state["rows_2_or_more"][0][0]
-            n_objects = cooked_state["rows_2_or_more"][0][1]
+            if k is not None:
+                n_objects = min(k, cooked_state["rows_2_or_more"][0][1])
+            else:
+                n_objects = cooked_state["rows_2_or_more"][0][1]
         else:
-            row = cooked_state["rows_2_or_more"][0][0]
-            n_objects = cooked_state["rows_2_or_more"][0][1] - 1
+            if k is not None:
+                n_objects = min(k, cooked_state["rows_2_or_more"][0][1] - 1)
+            else:
+                n_objects = cooked_state["rows_2_or_more"][0][1] - 1
 
     return Nimply(row, n_objects)
 
@@ -71,7 +81,7 @@ def evaluate(strategy1: Callable, strategy2: Callable) -> float:
     won = 0
 
     for m in range(NUM_MATCHES):
-        nim = Nim(NIM_SIZE)
+        nim = Nim(NIM_SIZE, k)
         player = 0
         while nim:
             ply = opponent[player](nim)
@@ -125,7 +135,7 @@ def sample_game(n, strategy1: Callable, strategy2: Callable) -> None:
 
 if __name__ == "__main__":
     print("Training evolutionary algorithm...")
-    ea = EvolutionaryModel(NIM_SIZE, 150, 100, 100, 10000, 0.2, NUM_MATCHES)
+    ea = EvolutionaryModel(NIM_SIZE, k, 150, 100, 100, 10000, 0.2, NUM_MATCHES)
     ea.simulate()
     best = ea.best_genome()
     ea_strategies = [
@@ -134,6 +144,8 @@ if __name__ == "__main__":
         optimal_strategy
     ]
     print(f"--- Size={NIM_SIZE}, games={NUM_MATCHES} ---")
+    if k is not None:
+        print(f"k={k}")
     print("Evolved strategy: ")
     print()
     for s in ea_strategies:

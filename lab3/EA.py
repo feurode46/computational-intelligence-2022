@@ -4,8 +4,9 @@ from nim import Nim, Nimply
 
 class EvolutionaryModel:
 
-    def __init__(self, nim_size=5, pop_size=150, offspring_size=100, epochs=1000, fitness_evaluations_threshold=10000, mutation_chance = 0.2, num_matches=100):
+    def __init__(self, nim_size=5, k=None, pop_size=150, offspring_size=100, epochs=1000, fitness_evaluations_threshold=10000, mutation_chance = 0.2, num_matches=100):
         self.N = nim_size
+        self.k = k
         self.num_matches = num_matches
         self.population_size = pop_size
         self.offspring_size = offspring_size
@@ -46,9 +47,15 @@ class EvolutionaryModel:
             if len(data["rows_2_or_more"]) > 0:
                 row = data["rows_2_or_more"][0][0]
                 if probs[0] > genome[0]:
-                    n_objects = data["rows_2_or_more"][0][1]  # take all
+                    if self.k is not None:
+                        n_objects = min(self.k, data["rows_2_or_more"][0][1])  # take all
+                    else:
+                        n_objects = data["rows_2_or_more"][0][1]  # take all
                 else:
-                    n_objects = data["rows_2_or_more"][0][1] - 1  # leave one
+                    if self.k is not None:
+                        n_objects = min(self.k, data["rows_2_or_more"][0][1] - 1)  # leave one
+                    else:
+                        n_objects = data["rows_2_or_more"][0][1] - 1
             else:
                 # forced move: take one from arbitrary row
                 row = data["active_rows"][0][0]
@@ -57,9 +64,15 @@ class EvolutionaryModel:
             if len(data["rows_2_or_more"]) > 0:
                 row = data["rows_2_or_more"][0][0]
                 if probs[1] > genome[1]:
-                    n_objects = data["rows_2_or_more"][0][1]  # take all
+                    if self.k is not None:
+                        n_objects = min(self.k, data["rows_2_or_more"][0][1])  # take all
+                    else:
+                        n_objects = data["rows_2_or_more"][0][1]  # take all
                 else:
-                    n_objects = data["rows_2_or_more"][0][1] - 1  # leave one
+                    if self.k is not None:
+                        n_objects = min(self.k, data["rows_2_or_more"][0][1] - 1)  # leave one
+                    else:
+                        n_objects = data["rows_2_or_more"][0][1] - 1
             else:
                 # forced move: take one
                 row = data["active_rows"][0][0]
@@ -69,7 +82,11 @@ class EvolutionaryModel:
 
     def random_strategy(self, state: Nim) -> Nimply:
         row = random.choice([r for r, c in enumerate(state.rows) if c > 0])
-        num_objects = random.randint(1, state.rows[row])
+        if self.k is not None:
+            num_objects = min(self.k, random.randint(1, state.rows[row]))
+        else:
+            num_objects = random.randint(1, state.rows[row])
+
         return Nimply(row, num_objects)
 
     def fitness_eval(self, genome):
