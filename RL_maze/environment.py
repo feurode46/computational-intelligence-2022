@@ -14,11 +14,10 @@ class Maze(object):
             self.m = 6
             self.n = 6
             self.generate_standard_maze()
-        self.robot_position = (0, 0)  # current robot position
-        self.steps = 0  # contains num steps robot took
-        self.allowed_states = None  # for now, this is none
-        self.construct_allowed_states()  # not implemented yet
-
+        self.robot_position = (0, 0)
+        self.steps = 0
+        self.allowed_states = None
+        self.construct_allowed_states()
     def generate_standard_maze(self):
         self.maze = np.zeros((self.m, self.n))
         self.maze[0, 0] = 2
