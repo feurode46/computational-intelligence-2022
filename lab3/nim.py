@@ -32,4 +32,3 @@ class Nim:
     def unnim(self, ply: Nimply) -> None:
         row, num_objects = ply
         self._rows[row] += num_objects
-
