@@ -28,3 +28,8 @@ class Nim:
         assert self._rows[row] >= num_objects
         assert self._k is None or num_objects <= self._k
         self._rows[row] -= num_objects
+
+    def unnim(self, ply: Nimply) -> None:
+        row, num_objects = ply
+        self._rows[row] += num_objects
+

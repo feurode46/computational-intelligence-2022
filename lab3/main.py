@@ -6,9 +6,10 @@ from copy import deepcopy
 from itertools import accumulate
 from operator import xor
 from EA import EvolutionaryModel
+import minimax as mm
 
 NUM_MATCHES = 100
-NIM_SIZE = 5
+NIM_SIZE = 3
 k = None
 
 
@@ -76,11 +77,17 @@ def my_strategy(state: Nim) -> Nimply:
     return Nimply(row, n_objects)
 
 
+def minimax_strategy(state: Nim) -> Nimply:
+    return mm.make_best_move(state)  # my turn
+
+
 def evaluate(strategy1: Callable, strategy2: Callable) -> float:
     opponent = (strategy1, strategy2)
     won = 0
 
     for m in range(NUM_MATCHES):
+        # if m % NUM_MATCHES/10 == 0:
+        # print(f"{m}/{NUM_MATCHES} games played")
         nim = Nim(NIM_SIZE, k)
         player = 0
         while nim:
@@ -93,7 +100,6 @@ def evaluate(strategy1: Callable, strategy2: Callable) -> float:
 
 
 def evaluate_EA(ea, strategy, reverse=False):
-
     # win rate over 100 matches
     won = 0
     for m in range(NUM_MATCHES):
@@ -133,26 +139,24 @@ def sample_game(n, strategy1: Callable, strategy2: Callable) -> None:
     print(f"status: Player {strategy[winner].__name__} won!")
 
 
-if __name__ == "__main__":
+def test_evolved_strategy(ea_):
     print("Training evolutionary algorithm...")
-    ea = EvolutionaryModel(NIM_SIZE, k, 150, 100, 100, 10000, 0.2, NUM_MATCHES)
-    ea.simulate()
-    best = ea.best_genome()
+    ea_.simulate()
+    best = ea_.best_genome()
     ea_strategies = [
         my_strategy,
         random_strategy,
         optimal_strategy
     ]
-    print(f"--- Size={NIM_SIZE}, games={NUM_MATCHES} ---")
-    if k is not None:
-        print(f"k={k}")
     print("Evolved strategy: ")
     print()
     for s in ea_strategies:
-        print(f"{ea.evolved_strategy.__name__} vs. {s.__name__}: winrate {evaluate_EA(ea, s) * 100}%")
-        print(f"{s.__name__} vs. {ea.evolved_strategy.__name__}: winrate {evaluate_EA(ea, s, reverse=True) * 100}%")
-
+        print(f"{ea_.evolved_strategy.__name__} vs. {s.__name__}: winrate {evaluate_EA(ea_, s) * 100}%")
+        print(f"{s.__name__} vs. {ea_.evolved_strategy.__name__}: winrate {evaluate_EA(ea_, s, reverse=True) * 100}%")
     print()
+
+
+def test_fixed_strategy():
     print("Fixed strategy: ")
     print()
 
@@ -160,11 +164,36 @@ if __name__ == "__main__":
         (my_strategy, random_strategy),
         (my_strategy, optimal_strategy)
     ]
-    # sample_game(NIM_SIZE, my_strategy, random_strategy)
 
     for p in strategy_pairs:
         print(f"{p[0].__name__} vs. {p[1].__name__}: winrate {evaluate(p[0], p[1]) * 100}%")
         print(f"{p[1].__name__} vs. {p[0].__name__}: winrate {evaluate(p[1], p[0]) * 100}%")
+    print()
+
+
+def test_minimax_strategy():
+    strategy_pairs = [
+        (minimax_strategy, random_strategy),
+        (minimax_strategy, optimal_strategy),
+        (minimax_strategy, my_strategy),
+    ]
+
+    for p in strategy_pairs:
+        print(f"{p[0].__name__} vs. {p[1].__name__}: winrate {evaluate(p[0], p[1]) * 100}%")
+        print(f"{p[1].__name__} vs. {p[0].__name__}: winrate {evaluate(p[1], p[0]) * 100}%")
+
+    print()
+
+
+if __name__ == "__main__":
+    print(f"--- Size={NIM_SIZE}, games={NUM_MATCHES} ---")
+    if k is not None:
+        print(f"k={k}")
+    ea = EvolutionaryModel(NIM_SIZE, k, 150, 100, 100, 10000, 0.2, NUM_MATCHES)
+    # test_evolved_strategy(ea)
+    # test_fixed_strategy()
+    test_minimax_strategy()
+    # sample_game(NIM_SIZE, minimax_strategy, random_strategy)
 
 
 
