@@ -9,7 +9,7 @@ from EA import EvolutionaryModel
 import minimax as mm
 
 NUM_MATCHES = 100
-NIM_SIZE = 3
+NIM_SIZE = 7
 k = None
 
 
@@ -90,8 +90,6 @@ def evaluate(strategy1: Callable, strategy2: Callable) -> float:
     won = 0
 
     for m in range(NUM_MATCHES):
-        # if m % NUM_MATCHES/10 == 0:
-        # print(f"{m}/{NUM_MATCHES} games played")
         nim = Nim(NIM_SIZE, k)
         player = 0
         while nim:
@@ -103,7 +101,7 @@ def evaluate(strategy1: Callable, strategy2: Callable) -> float:
     return won / NUM_MATCHES
 
 
-def evaluate_EA(ea, strategy, reverse=False):
+def evaluate_EA(ea_, strategy, reverse=False):
     # win rate over 100 matches
     won = 0
     for m in range(NUM_MATCHES):
@@ -112,12 +110,12 @@ def evaluate_EA(ea, strategy, reverse=False):
         while nim:
             if reverse:
                 if player == 1:
-                    ply = ea.evolved_strategy(ea.best_genome(), nim)
+                    ply = ea_.evolved_strategy(ea_.best_genome(), nim)
                 else:
                     ply = strategy(nim)
             else:
                 if player == 0:
-                    ply = ea.evolved_strategy(ea.best_genome(), nim)
+                    ply = ea_.evolved_strategy(ea_.best_genome(), nim)
                 else:
                     ply = strategy(nim)
             nim.nimming(ply)
