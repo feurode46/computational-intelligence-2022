@@ -81,6 +81,10 @@ def minimax_strategy(state: Nim) -> Nimply:
     return mm.make_best_move(state)  # my turn
 
 
+def alpha_beta_strategy(state: Nim) -> Nimply:
+    return mm.make_best_move_ab(state)  # my turn
+
+
 def evaluate(strategy1: Callable, strategy2: Callable) -> float:
     opponent = (strategy1, strategy2)
     won = 0
@@ -185,6 +189,20 @@ def test_minimax_strategy():
     print()
 
 
+def test_alpha_beta_strategy():
+    strategy_pairs = [
+        (alpha_beta_strategy, random_strategy),
+        (alpha_beta_strategy, optimal_strategy),
+        (alpha_beta_strategy, my_strategy),
+    ]
+
+    for p in strategy_pairs:
+        print(f"{p[0].__name__} vs. {p[1].__name__}: winrate {evaluate(p[0], p[1]) * 100}%")
+        print(f"{p[1].__name__} vs. {p[0].__name__}: winrate {evaluate(p[1], p[0]) * 100}%")
+
+    print()
+
+
 if __name__ == "__main__":
     print(f"--- Size={NIM_SIZE}, games={NUM_MATCHES} ---")
     if k is not None:
@@ -192,8 +210,9 @@ if __name__ == "__main__":
     ea = EvolutionaryModel(NIM_SIZE, k, 150, 100, 100, 10000, 0.2, NUM_MATCHES)
     # test_evolved_strategy(ea)
     # test_fixed_strategy()
-    test_minimax_strategy()
-    # sample_game(NIM_SIZE, minimax_strategy, random_strategy)
+    # test_minimax_strategy()
+    test_alpha_beta_strategy()
+    # sample_game(NIM_SIZE, alpha_beta_strategy, random_strategy)
 
 
 
