@@ -7,9 +7,10 @@ from itertools import accumulate
 from operator import xor
 from EA import EvolutionaryModel
 import minimax as mm
+import rl
 
 NUM_MATCHES = 100
-NIM_SIZE = 7
+NIM_SIZE = 3
 k = None
 
 
@@ -84,6 +85,8 @@ def minimax_strategy(state: Nim) -> Nimply:
 def alpha_beta_strategy(state: Nim) -> Nimply:
     return mm.make_best_move_ab(state)  # my turn
 
+def reinforcement_strategy(state: Nim) -> Nimply:
+    return rl.make_best_move(state)  # my turn
 
 def evaluate(strategy1: Callable, strategy2: Callable) -> float:
     opponent = (strategy1, strategy2)
@@ -201,16 +204,38 @@ def test_alpha_beta_strategy():
     print()
 
 
+def test_rl_strategy(agent: rl.RLAgent):
+    strategy_pairs = [
+        (agent.rl_strategy, random_strategy),
+        (agent.rl_strategy, optimal_strategy),
+        (agent.rl_strategy, my_strategy),
+    ]
+
+    for p in strategy_pairs:
+        print(f"{p[0].__name__} vs. {p[1].__name__}: winrate {evaluate(p[0], p[1]) * 100}%")
+        print(f"{p[1].__name__} vs. {p[0].__name__}: winrate {evaluate(p[1], p[0]) * 100}%")
+
+    print()
+
+
 if __name__ == "__main__":
     print(f"--- Size={NIM_SIZE}, games={NUM_MATCHES} ---")
     if k is not None:
         print(f"k={k}")
-    ea = EvolutionaryModel(NIM_SIZE, k, 150, 100, 100, 10000, 0.2, NUM_MATCHES)
+    # ea = EvolutionaryModel(NIM_SIZE, k, 150, 100, 100, 10000, 0.2, NUM_MATCHES)
     # test_evolved_strategy(ea)
     # test_fixed_strategy()
     # test_minimax_strategy()
-    test_alpha_beta_strategy()
+    # test_alpha_beta_strategy()
     # sample_game(NIM_SIZE, alpha_beta_strategy, random_strategy)
+
+    # --- TESTING RL agent ---
+    rl_agent = rl.train(NIM_SIZE, k, alpha=0.2, random_factor=0.01, iters=5000)
+    test_rl_strategy(rl_agent)
+    # sample_game(NIM_SIZE, rl_agent.rl_strategy, random_strategy)
+
+
+
 
 
 
