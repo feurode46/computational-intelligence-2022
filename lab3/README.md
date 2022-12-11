@@ -31,7 +31,14 @@ The strategy is based on a decision tree, in which if the number of active rows 
 
 This strategy, albeit being extremely simple and deduced by playing some games by myself, is able to beat an opponent using random moves around 95% of the time, and it seems to scale quite well with increasing game size.
 
-When $k$ is introduced, my strategy is able to beat the optimal strategy with a winrate that increases with a lower k. With $k=3$ it is able to win around 20% of the time.
+When $k$ is introduced, my strategy is able to beat the optimal strategy with a winrate that increases with a lower k. With a game size of 5 and $k=3$ it is able to win around 20% of the time.
+
+The following table holds true for various game sizes, and without k my strategy is never able to beat the optimal one.
+
+|     Opponent     | Average winrate |
+|:----------------:|:-------:|
+| Random strategy  |  >95%   |
+| Optimal strategy | 0%     |
 
 ## Task 3.2 - Evolved rules
 
@@ -60,6 +67,65 @@ The results of training the algorithm with a population size of 150, an offsprin
 
 This shows me that out of the possible actions under the specified conditions, the ones I had chosen by myself were the highest-winning ones, and the algorithm came to the same conclusion. The strategy achieves a 95% winrate against a random chance player. 
 
-Interestingly, by pitting my strategy against the evolved one, whoever starts first loses, because they are not able to reverse the even-odd row situation.
+By pitting my strategy against the evolved one, whoever starts first loses, because they are not able to reverse the even-odd row situation.
 
 When $k$ is introduced, whoever starts first has a small chance of winning.
+
+|     Opponent     | Average winrate |
+|:----------------:|:-------:|
+| Random strategy  |  >95%   |
+| Optimal strategy | 0%     |
+| Fixed strategy   | 0%/100% depending on who starts first |
+
+
+## Task 3.3 - Minimax
+
+_Resources: [*Wikipedia*](https://it.wikipedia.org/wiki/Minimax) provides a very useful pseudocode to understand minimax._
+
+The Minimax strategy is a very slow one, so after implementing a basic version I began adding optimizations such as memoization and alpha-beta pruning.
+
+The optimizations helped to make it run reasonably fast up to $N=7$, however it starts to take too long for evaluation after that.
+
+A known issue is that the implementation of Minimax using the aforementioned optimizations performs worse than the vanilla one, even though they should not be impacting on the efficacy of the algorithm. I encourage peer reviewers to check it out if they want :)
+
+Minimax is not able to converge to the optimal strategy, and it also doesn't perform great against the random strategy. The only values for a state are:
+
+- 1 (game won)
+- -1 (game lost)
+- 0 (game still in progress)
+
+I suspect that this information is not enough to make effective strategy decisions and a better heuristic might help a lot (again, excluding nimsum). However, I could not come up with a function to estimate the value of a state based on the number of objects present.
+
+Overall, the average winning rate for Minimax is:
+
+|     Opponent     | Average winrate |
+|:----------------:|:-------:|
+| Random strategy  | ~76%    |
+| Optimal strategy | 0%      |
+| Fixed strategy   | 0%      |
+
+It's not able to beat my strategy or the optimal one. The winrate on the random strategy is lower because it's too unpredictable compared to its own training.
+
+## Task 3.4 - Reinforcement Learning
+
+Once again, the reward for a state can only be -1, +1 or 0. As such, heuristics are pretty much non-existent.
+
+The G-table indicized by state-action pairs is initialized with uniformly random scores, that are adjusted according to the learning rate based on the outcome of the game.
+
+One thing I noticed about the agent is that it seems to be wildly inconsistent with its learning, no matter how I tuned the learning rate or the balance between exploration and exploitation.
+
+To mitigate the issue, a number of different agents are trained against the optimal strategy and the best one (the one that achieves the highest winning rate) is selected.
+
+Here are the absolute best results with a game size of 5 and unspecified k, evaluated over 1000 games.
+
+|     Opponent     | Winrate |
+|:----------------:|:-------:|
+| Random strategy  |  74.2%            |
+| Optimal strategy | 32.1% (start 1st) |
+| Fixed strategy   | 100% (any order) |
+
+These are by far the best results with any method, since it can beat even the optimal strategy, albeit a small percentage of the time. Interestingly, performance with random strategy is among the worst nonetheless.
+
+The algorithm is far from perfect, and as mentioned it is not able to come up with these results consistently. Higher winrate is much harder to come by.
+
+Furthermore, this particular model was selected for its acceptable performance against a random strategy, but other iterations showed a worse performance while still winning against the optimal strategy.
