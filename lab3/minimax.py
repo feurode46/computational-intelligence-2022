@@ -104,11 +104,7 @@ def make_best_move(state: Nim) -> Nimply:
     max_depth = math.inf
     minimax.counter = 0
     result = minimax(state, max_depth, True, Nimply(0, 0))
-    # print(f"Number of calls to minimax for this move: {minimax.counter}")
     best_move = Nimply(result.row, result.n)
-    # print(state_cache_max)
-    # print(state_cache_min)
-    # print(f"best move: {best_move}")
     return best_move
 
 
@@ -118,7 +114,6 @@ def make_best_move_ab(state: Nim) -> Nimply:
     a = -math.inf
     b = math.inf
     result = alpha_beta(state, max_depth, True, a, b, Nimply(0, 0))
-    # print(f"Number of calls to alpha_beta for this move: {alpha_beta.counter}")
     best_move = Nimply(result.row, result.n)
     return best_move
 

@@ -9,8 +9,8 @@ from EA import EvolutionaryModel
 import minimax as mm
 import rl
 
-NUM_MATCHES = 100
-NIM_SIZE = 3
+NUM_MATCHES = 1000
+NIM_SIZE = 5
 k = None
 
 
@@ -85,8 +85,6 @@ def minimax_strategy(state: Nim) -> Nimply:
 def alpha_beta_strategy(state: Nim) -> Nimply:
     return mm.make_best_move_ab(state)  # my turn
 
-def reinforcement_strategy(state: Nim) -> Nimply:
-    return rl.make_best_move(state)  # my turn
 
 def evaluate(strategy1: Callable, strategy2: Callable) -> float:
     opponent = (strategy1, strategy2)
@@ -104,7 +102,7 @@ def evaluate(strategy1: Callable, strategy2: Callable) -> float:
     return won / NUM_MATCHES
 
 
-def evaluate_EA(ea_, strategy, reverse=False):
+def evaluate_EA(ea_: EvolutionaryModel, strategy: Callable, reverse=False):
     # win rate over 100 matches
     won = 0
     for m in range(NUM_MATCHES):
@@ -144,7 +142,7 @@ def sample_game(n, strategy1: Callable, strategy2: Callable) -> None:
     print(f"status: Player {strategy[winner].__name__} won!")
 
 
-def test_evolved_strategy(ea_):
+def test_evolved_strategy(ea_: EvolutionaryModel):
     print("Training evolutionary algorithm...")
     ea_.simulate()
     best = ea_.best_genome()
@@ -177,6 +175,8 @@ def test_fixed_strategy():
 
 
 def test_minimax_strategy():
+    print("Minimax strategy (might take a while): ")
+    print()
     strategy_pairs = [
         (minimax_strategy, random_strategy),
         (minimax_strategy, optimal_strategy),
@@ -191,6 +191,8 @@ def test_minimax_strategy():
 
 
 def test_alpha_beta_strategy():
+    print("Minimax strategy with alpha-beta pruning:")
+    print()
     strategy_pairs = [
         (alpha_beta_strategy, random_strategy),
         (alpha_beta_strategy, optimal_strategy),
@@ -204,11 +206,30 @@ def test_alpha_beta_strategy():
     print()
 
 
-def test_rl_strategy(agent: rl.RLAgent):
+def test_rl_strategy():
+    best_wr = 0
+    best_agent = None
+    num_iters = 5
+    print(f"training RL agent... ({num_iters} iterations)")
+    for i in range(num_iters):
+        print(f"iteration: {i+1}/{num_iters}")
+        if best_agent is None:
+            rl_agent = rl.train(NIM_SIZE, k, random_strategy, alpha=0.4, random_factor=0.01, iters=5000)
+        else:
+            rl_agent = rl.train(NIM_SIZE, k, best_agent.rl_strategy, alpha=0.4, random_factor=0.01, iters=5000)
+
+        wr = max(evaluate(rl_agent.rl_strategy, random_strategy), 1 - evaluate(random_strategy, rl_agent.rl_strategy))
+        # print("winrate: ", wr)
+        if wr >= best_wr:
+            best_agent = rl_agent
+            best_wr = wr
+
+    print("Reinforcement learning strategy: ")
+    print()
     strategy_pairs = [
-        (agent.rl_strategy, random_strategy),
-        (agent.rl_strategy, optimal_strategy),
-        (agent.rl_strategy, my_strategy),
+        (best_agent.rl_strategy, random_strategy),
+        (best_agent.rl_strategy, optimal_strategy),
+        (best_agent.rl_strategy, my_strategy),
     ]
 
     for p in strategy_pairs:
@@ -222,18 +243,14 @@ if __name__ == "__main__":
     print(f"--- Size={NIM_SIZE}, games={NUM_MATCHES} ---")
     if k is not None:
         print(f"k={k}")
-    # ea = EvolutionaryModel(NIM_SIZE, k, 150, 100, 100, 10000, 0.2, NUM_MATCHES)
-    # test_evolved_strategy(ea)
-    # test_fixed_strategy()
-    # test_minimax_strategy()
-    # test_alpha_beta_strategy()
-    # sample_game(NIM_SIZE, alpha_beta_strategy, random_strategy)
+    ea = EvolutionaryModel(NIM_SIZE, k, 150, 100, 100, 10000, 0.2, 100)
+    test_evolved_strategy(ea)
+    test_fixed_strategy()
+    # test_minimax_strategy()  # uncomment to use minimax strategy without pruning, better results but it's slow
+    test_alpha_beta_strategy()
+    test_rl_strategy()
 
-    # --- TESTING RL agent ---
-    rl_agent = rl.train(NIM_SIZE, k, alpha=0.2, random_factor=0.01, iters=5000)
-    test_rl_strategy(rl_agent)
-    # sample_game(NIM_SIZE, rl_agent.rl_strategy, random_strategy)
-
+    print("All done!")
 
 
 
