@@ -10,7 +10,7 @@ import minimax as mm
 import rl
 
 NUM_MATCHES = 1000
-NIM_SIZE = 5
+NIM_SIZE = 3
 k = None
 
 
@@ -209,17 +209,12 @@ def test_alpha_beta_strategy():
 def test_rl_strategy():
     best_wr = 0
     best_agent = None
-    num_iters = 5
+    num_iters = 20
     print(f"training RL agent... ({num_iters} iterations)")
     for i in range(num_iters):
         print(f"iteration: {i+1}/{num_iters}")
-        if best_agent is None:
-            rl_agent = rl.train(NIM_SIZE, k, random_strategy, alpha=0.4, random_factor=0.01, iters=5000)
-        else:
-            rl_agent = rl.train(NIM_SIZE, k, best_agent.rl_strategy, alpha=0.4, random_factor=0.01, iters=5000)
-
-        wr = max(evaluate(rl_agent.rl_strategy, random_strategy), 1 - evaluate(random_strategy, rl_agent.rl_strategy))
-        # print("winrate: ", wr)
+        rl_agent = rl.train(NIM_SIZE, k, optimal_strategy, alpha=0.3, random_factor=0.01, iters=5000)
+        wr = max(evaluate(rl_agent.rl_strategy, optimal_strategy), 1 - evaluate(optimal_strategy, rl_agent.rl_strategy))
         if wr >= best_wr:
             best_agent = rl_agent
             best_wr = wr
